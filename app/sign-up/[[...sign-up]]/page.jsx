@@ -1,6 +1,4 @@
-'use client'
-
-import { SignUp } from '@clerk/clerk-react'
+import { SignUp } from '@clerk/nextjs'
 
 const SignUpPage = () => {
   return (

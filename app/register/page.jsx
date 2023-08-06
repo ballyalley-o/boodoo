@@ -1,12 +1,21 @@
 'use client'
-
 import { useState } from 'react'
 import { useSignUp } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
+// styles
+import {
+  StyledRegisterContainerDiv,
+  StyledRegisterHeaderH1,
+  StyledFormWrapperForm,
+  StyledRegisterButton,
+} from '../theme'
 // assets
 import { toast } from 'react-toastify'
 // components
 import InputField from '../components/Forms/InputField'
+// constants
+import { SNACKS, FORMLABELS, HEADERS, BUTTONS } from '../constants'
+import { complete, home, button_type } from '../config'
 
 const RegisterPage = () => {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -23,92 +32,111 @@ const RegisterPage = () => {
     e.preventDefault()
     if (!isLoaded) return
     try {
-      await signUp({
+      await signUp.create({
         first_name: firstName,
         last_name: lastName,
-        email,
+        email_address: email,
         username,
         password,
       })
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
       setPendingVerification(true)
+      toast.success(SNACKS.REGISTER_SUCCESS)
+    } catch (error) {
+      console.log(error)
+      toast.error(error)
+    }
+  }
+
+  const onPressVerify = async (e) => {
+    e.preventDefault()
+    if (!isLoaded) return
+
+    try {
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code,
+      })
+      if (completeSignUp.status !== complete) {
+        // investigate the response, to see if there was an error or if the user needsto complete more steps
+        toast.error(SNACKS.VERIFY_CODE_INVALID)
+        return
+      }
+      if (completeSignUp.status === complete) {
+        await setActive({ session: completeSignUp.createdSessionId })
+        toast.success(SNACKS.VERIFY_SUCCESS)
+        router.push(home)
+      }
     } catch (error) {
       console.log(error)
       toast.error(error.message)
     }
   }
 
-  const onPressVerify = async (e) => {}
-
   return (
-    <div
-      className='border p-5 rounded border-black border'
-      style={{ width: '500px' }}
-    >
-      <h1 className='text-2xl mb-4'>Create your account</h1>
+    <div className={StyledRegisterContainerDiv} style={{ width: '500px' }}>
+      <h1 className={StyledRegisterHeaderH1}>{HEADERS.REGISTER_HEADER}</h1>
       {!pendingVerification && (
-        <form onSubmit={handleSubmit} className='space-y-4 md:space-y-6'>
+        <form onSubmit={handleSubmit} className={StyledFormWrapperForm}>
           <InputField
-            label='First Name'
-            name='first_name'
+            label={FORMLABELS.FIRST_NAME.label}
+            name={FORMLABELS.FIRST_NAME.name}
             onChange={(e) => {
               setFirstName(e.target.value)
             }}
           />
           <InputField
-            label='Last Name'
-            name='last_name'
+            label={FORMLABELS.LAST_NAME.label}
+            name={FORMLABELS.LAST_NAME.name}
             onChange={(e) => {
               setLastName(e.target.value)
             }}
             required
           />
           <InputField
-            type='email'
-            label='Email'
-            name='email'
+            type={FORMLABELS.EMAIL.type}
+            label={FORMLABELS.EMAIL.label}
+            name={FORMLABELS.EMAIL.name}
             onChange={(e) => {
               setEmail(e.target.value)
             }}
             required
           />
           <InputField
-            label='Username'
-            name='username'
+            label={FORMLABELS.USERNAME.label}
+            name={FORMLABELS.USERNAME.name}
             onChange={(e) => {
               setUsername(e.target.value)
             }}
           />
           <InputField
-            label='Password'
-            name='password'
+            type={FORMLABELS.PASSWORD.type}
+            label={FORMLABELS.PASSWORD.label}
+            name={FORMLABELS.PASSWORD.name}
             onChange={(e) => {
               setPassword(e.target.value)
             }}
             required
           />
-          <button
-            type='submit'
-            className='w-full text-gray-300 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-lg px-5 text-center py-2'
-          >
-            Create your account
+          <button type={button_type} className={StyledRegisterButton}>
+            {BUTTONS.REGISTER}
           </button>
         </form>
       )}
       {pendingVerification && (
-        <form action='' className='space-y-4 md:space-y-6'>
+        <form
+          action=''
+          onSubmit={onPressVerify}
+          className={StyledFormWrapperForm}
+        >
           <InputField
-            label='Verification Code'
-            name='code'
+            label={FORMLABELS.VERIFY.label}
+            name={FORMLABELS.VERIFY.name}
             onChange={(e) => {
               setCode(e.target.value)
             }}
           />
-          <button
-            type='submit'
-            className='w-full text-gray-300 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-lg px-5 text-center py-2'
-          >
-            Verify email
+          <button type={button_type} className={StyledRegisterButton}>
+            {BUTTONS.VERIFY}
           </button>
         </form>
       )}

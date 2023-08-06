@@ -1,15 +1,15 @@
 import React from 'react'
-import Link from 'next/link'
 import { UserButton, auth } from '@clerk/nextjs'
 // styles
-import {
-  StyledNavDiv,
-  StyledLogoText,
-  StyledNavLink,
-  StyledLinkWrapperDiv,
-} from '../theme'
+import { StyledNavDiv, StyledLinkWrapper, StyledLinkWrapperDiv } from '../theme'
+// components
+import Logo from './Logo'
+import LinkCombo from './LinkCombo'
 // assets
-import { FaFirstOrder, FaSignInAlt } from 'react-icons/fa'
+import { FaSignInAlt } from 'react-icons/fa'
+// constants
+import { BUTTONS } from '../constants'
+import { home, signIn, signUp, profile } from '../config'
 
 function Header() {
   const { userId } = auth()
@@ -17,36 +17,17 @@ function Header() {
   return (
     <>
       <nav className={StyledNavDiv}>
-        <div className='flex items-center'>
-          <Link href='/'>
-            <div className={StyledLogoText}>
-              BOO <FaFirstOrder />
-              DOO
-            </div>
-          </Link>
-        </div>
+        <Logo />
         <div className={StyledLinkWrapperDiv}>
           {!userId && (
             <>
-              <Link href='/sign-in' className={StyledNavLink}>
-                <FaSignInAlt />
-              </Link>
-              |
-              <Link href='/sign-up' className={StyledNavLink}>
-                Sign Up
-              </Link>
+              <LinkCombo href={signIn} content={<FaSignInAlt />} />|
+              <LinkCombo href={signUp} content={BUTTONS.SIGN_UP} />
             </>
           )}
-          {userId && (
-            <Link
-              href='profile'
-              className='text-white hover:text-gray-300 mr-4'
-            >
-              Profile
-            </Link>
-          )}
-          <div className='ml-auto'>
-            <UserButton afterSignOutUrl='/' />
+          {userId && <LinkCombo href={profile} content={BUTTONS.PROFILE} />}
+          <div className={StyledLinkWrapper}>
+            <UserButton afterSignOutUrl={home} />
           </div>
         </div>
       </nav>

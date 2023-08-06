@@ -1,13 +1,14 @@
 import './globals.css'
 import 'react-toastify/dist/ReactToastify.css'
 // styles
-import { StyledContainerDiv } from './theme/styles/default'
+import { StyledContainerDiv, StyledWrapper, StyledContainer } from './theme'
 import { Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
 import Header from './components/Header'
 import { ToastContainer } from 'react-toastify'
-
+// constants
+import { lang } from './config'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
@@ -22,20 +23,16 @@ export default function RootLayout({ children }) {
         baseTheme: dark,
       }}
     >
-      <html lang='en'>
+      <html lang={lang.en}>
         <body className={inter.className}>
           <Header />
-          <main className='container'>
+          <main className={StyledContainer}>
             <div className={StyledContainerDiv}>
-              <div className='mt-20'>{children}</div>
+              <div className={StyledWrapper}>{children}</div>
             </div>
           </main>
         </body>
-        <ToastContainer
-          position='top-center'
-          autoClose={2000}
-          hideProgressBar={false}
-        />
+        <ToastContainer />
       </html>
     </ClerkProvider>
   )

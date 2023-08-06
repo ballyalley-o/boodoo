@@ -16,3 +16,7 @@ export const StyledNavLink = classNames('text-white hover:text-gray-300 mr-4')
 export const StyledLinkWrapperDiv = classNames(
   'flex flex-row items-center justify-between gap-4 text-white'
 )
+export const StyledLogoWrapperDiv = classNames('flex items-center')
+export const StyledLinkWrapper = classNames('ml-auto')
+export const StyledContainer = classNames('container')
+export const StyledWrapper = classNames('mt-20')
